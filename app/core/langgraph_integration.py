@@ -278,7 +278,7 @@ def get_langgraph_processor() -> LangGraphTemplateProcessor:
     if _langgraph_processor is None:
         print("LangGraph 프로세서 초기화 중...")
         _langgraph_processor = LangGraphTemplateProcessor()
-        print("LangGraph 프로세서 초기화 완룼")
+        print("LangGraph 프로세서 초기화 완료")
 
     return _langgraph_processor
 

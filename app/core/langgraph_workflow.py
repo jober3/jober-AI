@@ -667,25 +667,3 @@ async def _adapt_existing_template(template: Dict[str, Any], variables: Dict[str
     adapted["adapted_variables"] = variables
     adapted["adaptation_method"] = "simple_variable_substitution"
     return adapted
-
-
-# ========== 템플릿 선택기 임시 구현 ==========
-
-class TemplateSelector:
-    """템플릿 선택기 (임시 구현)"""
-
-    def find_similar_template(self, user_input: str, variables: Dict[str, str], intent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """유사한 템플릿 검색 (임시 구현)"""
-        # 실제로는 벡터 데이터베이스 검색 로직
-        # 현재는 시뮬레이션
-        similarity_score = 0.3  # 임시 점수
-
-        if similarity_score > 0.85:
-            return {
-                "template_id": "temp_001",
-                "similarity_score": similarity_score,
-                "template_content": "임시 템플릿 내용",
-                "metadata": {"source": "predata"}
-            }
-
-        return None
