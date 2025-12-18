@@ -54,6 +54,10 @@ class SessionData:
     missing_variables: List[str] = field(default_factory=list)
     completion_percentage: float = 0.0
 
+    # Industry/Purpose 데이터
+    industries: List[str] = field(default_factory=list)  # 업종 리스트
+    purposes: List[str] = field(default_factory=list)    # 용도 리스트
+
     # Agent 결과
     agent1_result: Optional[Dict] = None
     agent2_result: Optional[Dict] = None
@@ -128,10 +132,17 @@ class SessionData:
 
         return updated_count
 
-    def set_template_data(self, template: str, variables: List[Dict], source: str = "generated"):
+    def set_template_data(self, template: str, variables: List[Dict], source: str = "generated",
+                         industries: Optional[List[str]] = None, purposes: Optional[List[str]] = None):
         """템플릿 데이터 설정"""
         self.template_content = template
         self.template_source = source
+
+        # Industry/Purpose 데이터 설정
+        if industries is not None:
+            self.industries = industries
+        if purposes is not None:
+            self.purposes = purposes
 
         # 변수 정보 설정
         self.template_variables = {}
@@ -192,6 +203,8 @@ class SessionData:
             "user_variables": self.user_variables,
             "missing_variables": self.missing_variables,
             "completion_percentage": self.completion_percentage,
+            "industries": self.industries,
+            "purposes": self.purposes,
             "update_count": self.update_count,
             "error_messages": self.error_messages,
             "validation_errors": self.validation_errors

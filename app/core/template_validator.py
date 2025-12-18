@@ -5,9 +5,13 @@ RAGAS 대신 자체 검증 로직으로 템플릿 품질 보장
 """
 import re
 import json
+import logging
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
+
+# 로거 설정
+logger = logging.getLogger(__name__)
 
 class ValidationStatus(Enum):
     PASSED = "PASSED"
@@ -70,8 +74,8 @@ class TemplateValidator:
         """
         validation_results = []
 
-        # DEBUG: Tools 결과 로깅
-        print(f"DEBUG - Tools Results: {tools_results}")
+        # Tools 결과 로깅
+        logger.debug(f"Tools Results: {tools_results}")
 
         # 1. BlackList 검증
         blacklist_result = self._validate_blacklist_compliance(
@@ -112,9 +116,9 @@ class TemplateValidator:
         compliance_check = blacklist_result.get("compliance_status", "UNKNOWN")
         violations = blacklist_result.get("risk_keywords", [])
 
-        # DEBUG: BlackList 결과 로깅
-        print(f"DEBUG - BlackList Result: {blacklist_result}")
-        print(f"DEBUG - compliance_status: {compliance_check}")
+        # BlackList 결과 로깅
+        logger.debug(f"BlackList Result: {blacklist_result}")
+        logger.debug(f"Compliance Status: {compliance_check}")
 
         if compliance_check == "FAILED":
             # 치명적 실패

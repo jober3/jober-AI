@@ -217,7 +217,9 @@ class SessionManager:
             return False
 
     def set_template_data(self, session_id: str, template: str,
-                         variables: List[Dict], source: str = "generated") -> bool:
+                         variables: List[Dict], source: str = "generated",
+                         industries: Optional[List[str]] = None,
+                         purposes: Optional[List[str]] = None) -> bool:
         """
         템플릿 데이터 설정
 
@@ -226,6 +228,8 @@ class SessionManager:
             template: 템플릿 내용
             variables: 변수 목록
             source: 템플릿 소스
+            industries: 업종 리스트
+            purposes: 용도 리스트
 
         Returns:
             설정 성공 여부
@@ -235,7 +239,7 @@ class SessionManager:
             if not session or session.is_expired():
                 return False
 
-            session.set_template_data(template, variables, source)
+            session.set_template_data(template, variables, source, industries, purposes)
             logger.info(f"세션 {session_id}: 템플릿 데이터 설정 완료 ({len(variables)}개 변수)")
             return True
 

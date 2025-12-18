@@ -704,10 +704,8 @@ async def create_template(request: TemplateRequest):
             f"❌ [REQUEST ERROR] {request_id} - Duration: {total_time:.2f}s - Error: {error_message}"
         )
 
-        # 예상치 못한 오류 - 디버그 로깅 추가
-        print(f"DEBUG: 템플릿 생성 중 예외 발생: {error_message}")
+        # 예외 스택 트레이스 출력
         import traceback
-
         traceback.print_exc()
 
         # 특정 오류에 대한 세부 처리

@@ -33,6 +33,12 @@ class VariableUpdateRequest(BaseModel):
     variables: Dict[str, str]
 
 
+class IndustryPurposeUpdateRequest(BaseModel):
+    """Industry/Purpose 업데이트 요청 모델"""
+    industries: Optional[List[str]] = None
+    purposes: Optional[List[str]] = None
+
+
 class CompleteTemplateRequest(BaseModel):
     """템플릿 완성 요청 모델"""
     final_adjustments: Optional[Dict[str, str]] = None
@@ -233,6 +239,62 @@ async def update_session_variables(session_id: str, request: VariableUpdateReque
         )
 
 
+@router.put("/templates/{session_id}/industry-purpose", tags=["Real-time Chat"])
+async def update_session_industry_purpose(session_id: str, request: IndustryPurposeUpdateRequest):
+    """
+    세션의 Industry/Purpose 정보 업데이트
+
+    Args:
+        session_id: 세션 ID
+        request: Industry/Purpose 업데이트 요청
+
+    Returns:
+        업데이트 결과
+    """
+    try:
+        session_manager = get_session_manager()
+
+        # 세션 유효성 검증
+        session = session_manager.get_session(session_id)
+        if not session:
+            raise HTTPException(
+                status_code=404,
+                detail=create_error_response(
+                    "SESSION_NOT_FOUND",
+                    "세션을 찾을 수 없거나 만료되었습니다.",
+                    f"세션 ID: {session_id}"
+                )
+            )
+
+        # Industry/Purpose 업데이트
+        if request.industries is not None:
+            session.industries = request.industries
+        if request.purposes is not None:
+            session.purposes = request.purposes
+
+        session.last_updated = datetime.now()
+
+        return {
+            "success": True,
+            "session_id": session_id,
+            "industries": session.industries,
+            "purposes": session.purposes,
+            "message": "Industry/Purpose 정보가 성공적으로 업데이트되었습니다."
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=create_error_response(
+                "INTERNAL_ERROR",
+                "Industry/Purpose 업데이트 중 오류가 발생했습니다.",
+                str(e)
+            )
+        )
+
+
 @router.get("/templates/{session_id}/preview", tags=["Real-time Chat"], response_model=SessionPreviewResponse)
 async def get_template_preview(session_id: str, style: str = Query("missing", description="미리보기 스타일")):
     """
@@ -416,13 +478,15 @@ async def complete_template_session(session_id: str, request: CompleteTemplateRe
                 "value": session.user_variables.get(var_key, "")
             })
 
-        # Industry/Purpose 데이터를 기존 및 새로운 형식 둘 다 생성
-        # 세션에서는 industry/purpose 데이터가 없으므로 기본값 사용
-        # TODO: 향후 세션에 industry/purpose 저장 기능 추가 필요
-        converted_data = convert_industry_purpose_data([], [])
+        # Industry/Purpose 데이터를 세션에서 가져오기
+        session_industries = session.industries if session.industries else []
+        session_purposes = session.purposes if session.purposes else []
 
-        # 동적 카테고리 결정 (빈 데이터로 기본값 반환)
-        category_info = get_category_info([], [])
+        # Industry/Purpose 데이터 변환 (기존 및 새로운 형식)
+        converted_data = convert_industry_purpose_data(session_industries, session_purposes)
+
+        # 동적 카테고리 결정
+        category_info = get_category_info(session_industries, session_purposes)
 
         response_data = {
             "id": None,  # Java 백엔드에서 DB 자동생성 ID 사용
